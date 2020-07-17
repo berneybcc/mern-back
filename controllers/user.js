@@ -57,7 +57,23 @@ function signIn(req,res){
             if(!userStored){
                 res.status(404).send({message:"Usuario no encontrado"});
             }else{
-
+                bcrypt.compare(password,userStored.password,(err,check)=>{
+                    if(err){
+                        res.status(500).send({message:"Error de servidor"});
+                    }
+                    else{
+                        if(!userStored.active){
+                            res.status(200).send({message:"Usuario no se encuentra activado"});
+                        }else if(!check){
+                            res.status(500).send({message:"La contraseña es Incorrecta"});
+                        }else{
+                            res.status(200).send({
+                                accessToken:jwt.createAccessToken(userStored),
+                                refreshToken:jwt.createRefreshToken(userStored)
+                            })
+                        }
+                    }
+                })
             }
         }
     })
