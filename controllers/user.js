@@ -47,10 +47,10 @@ function signUp(req,res){
 
 function signIn(req,res){
     const { email,password } = req.body;
-    email=email.toLowerCase();
+    email.toLowerCase();
 
     User.findOne({email},(error,userStored)=>{
-        if(err){
+        if(error){
             res.status(500).send({message:"Error del servidor"});
         }
         else{
@@ -60,12 +60,12 @@ function signIn(req,res){
                 bcrypt.compare(password,userStored.password,(err,check)=>{
                     if(err){
                         res.status(500).send({message:"Error de servidor"});
+                    }else if(!check){
+                        res.status(404).send({message:"La contraseña es Incorrecta"});
                     }
                     else{
                         if(!userStored.active){
                             res.status(200).send({message:"Usuario no se encuentra activado"});
-                        }else if(!check){
-                            res.status(500).send({message:"La contraseña es Incorrecta"});
                         }else{
                             res.status(200).send({
                                 accessToken:jwt.createAccessToken(userStored),
